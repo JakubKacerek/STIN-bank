@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300&display=swap"
+        rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online banking</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="subcontainer">
+            <div id="layout">
+                <div class="one">
+                    <ul>
+                        <li>
+                            <a href="#">&#10147; <span style="text-decoration: underline;">Overview</span></a>
+                        </li>
+                        <li>
+                            <a href="acc.html">&#10146;Accounts</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="two">
+                    <div class="twocontainer">
+                        <h2>
+                            Exchange rates
+                        </h2>
+                        <div class="reload">Click me to refresh the exchange rates</div>
+                        <table class="paddingBetweenCols">
+                            <tr>
+                                <th>State</th>
+                                <th>Currency</th>
+                                <th>Amount</th>
+                                <th>Code</th>
+                                <th>Rate</th>
+                            </tr>
+                            <tr>
+                                <td>Australia</td>
+                                <td>dolar</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">AUD</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Brazil</td>
+                                <td>real</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">BRL</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Bulgaria</td>
+                                <td>lev</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">BGN</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>China</td>
+                                <td>yen-min-pi</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">CNY</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Denmark</td>
+                                <td>crown</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">DKK</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>EMU</td>
+                                <td>euro</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">EUR</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Philippines</td>
+                                <td>peso</td>
+                                <td style="text-align: end;">100</td>
+                                <td style="text-align: center;">PHP</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Hongkong</td>
+                                <td>dolar</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">HKD</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>India</td>
+                                <td>rupee</td>
+                                <td style="text-align: end;">100</td>
+                                <td style="text-align: center;">INR</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Indonesia</td>
+                                <td>rupee</td>
+                                <td style="text-align: end;">1000</td>
+                                <td style="text-align: center;">IDR</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Iceland</td>
+                                <td>crown</td>
+                                <td style="text-align: end;">100</td>
+                                <td style="text-align: center;">ISK</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Israel</td>
+                                <td>New shekel</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">ILS</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Japan</td>
+                                <td>yen</td>
+                                <td style="text-align: end;">100</td>
+                                <td style="text-align: center;">JPY</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>South Africa</td>
+                                <td>rand</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">ZAR</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Canada</td>
+                                <td>dolar</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">CAD</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Korean Republic</td>
+                                <td>won</td>
+                                <td style="text-align: end;">100</td>
+                                <td style="text-align: center;">KRW</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Hungary</td>
+                                <td>forint</td>
+                                <td style="text-align: end;">100</td>
+                                <td style="text-align: center;">HUF</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Malaysia</td>
+                                <td>ringit</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">MYR</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Mexico</td>
+                                <td>peso</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">MXN</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>MMF</td>
+                                <td>SDR</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">XDR</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Norway</td>
+                                <td>crown</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">NOK</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>New Zealand</td>
+                                <td>dolar</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">NZD</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Poland</td>
+                                <td>zloty</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">PLN</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Romania</td>
+                                <td>leu</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">RON</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Singapur</td>
+                                <td>dolar</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">SGD</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Sweden</td>
+                                <td>crown</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">SEK</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Switzerland</td>
+                                <td>franc</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">CHF</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Thailand</td>
+                                <td>baht</td>
+                                <td style="text-align: end;">100</td>
+                                <td style="text-align: center;">THB</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Turkey</td>
+                                <td>lira</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">TRY</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>USA</td>
+                                <td>dolar</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">USD</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Great Britain</td>
+                                <td>pound</td>
+                                <td style="text-align: end;">1</td>
+                                <td style="text-align: center;">GBP</td>
+                                <td></td>
+                            </tr>
+                            
+                        </table>
+                    </div>
+                </div>
+                <div class="three">
+                    <div class="threecontainer">
+                        <h1>Current balance : <span style="color: white;">{{ balance.balance }}CZK</span></h1>
+                        <hr>
+                        <div class="actionscontainer">
+                            <div class="actions">
+                                <h2>Account actions</h2>
+                                <ul>
+                                    <li>
+                                        Plus 1mil
+                                    </li>
+                                    <li>
+                                        Plus 2mil
+                                    </li>
+                                    <li>
+                                        Minus 3mil
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="functions">
+                                <h2>Functions</h2>
+                                <div id="functionslayout">
+                                    <div class="butOne">
+                                        <h3>Outgoing payment</h3>
+                                    </div>
+                                    <div class="butTwo">
+                                        <h3>Incoming payment</h3>
+                                    </div>
+                                    <div class="butThree">
+                                        <h3>Recharge account</h3>
+                                    </div>
+                                    <div class="butFour">
+                                        <h3>Admin <br>Panel</h3>
+                                    </div>
+                                    <div class="functionsMenu">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
