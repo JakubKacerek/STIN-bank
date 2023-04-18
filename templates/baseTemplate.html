@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300&display=swap"
+        rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}
+Online banking
+        {% endblock %}
+    </title>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var adminPanelDiv = document.getElementById('admin_panel_link');
+    if (adminPanelDiv) {
+        adminPanelDiv.addEventListener('click', function() {
+            window.location.href = '/admin/';
+        });
+    }
+});
+</script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="subcontainer">
+            <div id="layout">
+                {% block kokot1 %}
+                <div class="one">
+                    <ul>
+                        <li>
+                            <a href="#">&#10147; <span style="text-decoration: underline;">Overview</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'accounts:logout' %}">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="two">
+                    <div class="twocontainer">
+                        <h2>
+                            Exchange rates
+                        </h2>
+                        {% block exchRates %}
+                        <table class="paddingBetweenCols">
+                            <tr>
+                                <th>State</th>
+                                <th>Currency</th>
+                                <th>Amount</th>
+                                <th>Code</th>
+                                <th>Rate</th>
+                            </tr>
+                            {% for rate in rates %}
+                            <tr>
+                                <td>{{ rate.country }}</td>
+                                <td>{{ rate.currency }}</td>
+                                <td style="text-align: end;">{{ rate.amount }}</td>
+                                <td style="text-align: center;">{{ rate.code }}</td>
+                                <td style="text-align: start">{{ rate.rate }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                            {% endblock %}
+                    </div>
+                </div>
+                {% endblock %}
+                <div class="three">
+                    <div class="threecontainer">
+                        {% block balance %}
+                        <h1>Current balance : <span style="color: white;">{{ balance.balance }} CZK</span></h1>
+                        <hr>
+                        {% endblock %}
+                        <div class="actionscontainer">
+                        {% block actions %}
+                            <div class="actions">
+                                <h2>Account actions</h2>
+                                <ul>
+                                    <li>
+                                        Plus 1mil
+                                    </li>
+                                    <li>
+                                        Plus 2mil
+                                    </li>
+                                    <li>
+                                        Minus 3mil
+                                    </li>
+                                </ul>
+                            </div>
+                        {% endblock %}
+                            <div class="functions">
+                                {% block functions %}
+                                <h2>Functions</h2>
+                                <div id="functionslayout">
+                                    <div class="butOne">
+                                        <h3>Outgoing payment</h3>
+                                    </div>
+                                    <div class="butTwo">
+                                        <h3>Incoming payment</h3>
+                                    </div>
+                                    <div class="butThree">
+                                        <h3>Recharge account</h3>
+                                    </div>
+                            <div class="butFour" id="admin_panel_link">
+                                        <h3>Admin <br>Panel</h3>
+                                    </div>
+                                    {% endblock %}
+                            {% block functionsMenu %}
+                                    <div class="functionsMenu">
+
+                                    </div>
+                            {% endblock %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>

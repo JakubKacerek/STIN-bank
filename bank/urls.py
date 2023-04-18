@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.urls import path
 
-from bank.views import home
+from bank.views import HomeView
+
+app_name='bank'
 
 urlpatterns = [
-    path('', home),
+    path('', HomeView.as_view(), name='dashobard'),
 ]

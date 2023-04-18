@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 
+from django.contrib import messages
+from django.urls import reverse_lazy
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -27,6 +30,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+LOGOUT_REDIRECT_URL = reverse_lazy('accounts:login')
+LOGIN_REDIRECT_URL = reverse_lazy('bank:dashobard')
 
 # Application definition
 
@@ -37,8 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'Banking',
-    'bank'
+    'bank',
+    'accounts'
 ]
 
 MIDDLEWARE = [
@@ -50,6 +57,13 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'alert alert-danger',
+    messages.SUCCESS: 'alert alert-success',
+    messages.INFO: 'alert alert-info',
+    messages.WARNING: 'alert alert-warning',
+}
 
 ROOT_URLCONF = 'Banking.urls'
 
