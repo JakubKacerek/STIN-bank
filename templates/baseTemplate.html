@@ -8,30 +8,32 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300&display=swap"
-        rel="stylesheet">
+          rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         {% block title %}
-Online banking
+            Online banking
         {% endblock %}
     </title>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var adminPanelDiv = document.getElementById('admin_panel_link');
-    if (adminPanelDiv) {
-        adminPanelDiv.addEventListener('click', function() {
-            window.location.href = '/admin/';
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var adminPanelDiv = document.getElementById('admin_panel_link');
+            if (adminPanelDiv) {
+                adminPanelDiv.addEventListener('click', function () {
+                    window.location.href = '/admin/';
+                });
+            }
         });
-    }
-});
-</script>
+
+    </script>
 </head>
 
 <body>
-    <div class="container">
-        <div class="subcontainer">
-            <div id="layout">
-                {% block kokot1 %}
+<div class="container">
+    <div class="subcontainer">
+        <div id="layout">
+            {% block kokot1 %}
                 <div class="one">
                     <ul>
                         <li>
@@ -48,35 +50,49 @@ document.addEventListener('DOMContentLoaded', function() {
                             Exchange rates
                         </h2>
                         {% block exchRates %}
-                        <table class="paddingBetweenCols">
-                            <tr>
-                                <th>State</th>
-                                <th>Currency</th>
-                                <th>Amount</th>
-                                <th>Code</th>
-                                <th>Rate</th>
-                            </tr>
-                            {% for rate in rates %}
-                            <tr>
-                                <td>{{ rate.country }}</td>
-                                <td>{{ rate.currency }}</td>
-                                <td style="text-align: end;">{{ rate.amount }}</td>
-                                <td style="text-align: center;">{{ rate.code }}</td>
-                                <td style="text-align: start">{{ rate.rate }}</td>
-                            </tr>
-                            {% endfor %}
-                        </table>
-                            {% endblock %}
+                            <table class="paddingBetweenCols">
+                                <tr>
+                                    <th>State</th>
+                                    <th>Currency</th>
+                                    <th>Amount</th>
+                                    <th>Code</th>
+                                    <th>Rate</th>
+                                </tr>
+                                {% for rate in rates %}
+                                    <tr>
+                                        <td>{{ rate.country }}</td>
+                                        <td>{{ rate.currency }}</td>
+                                        <td style="text-align: end;">{{ rate.amount }}</td>
+                                        <td style="text-align: center;">{{ rate.code }}</td>
+                                        <td style="text-align: start">{{ rate.rate }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% endblock %}
                     </div>
                 </div>
-                {% endblock %}
-                <div class="three">
-                    <div class="threecontainer">
-                        {% block balance %}
-                        <h1>Current balance : <span style="color: white;">{{ balance.balance }} CZK</span></h1>
-                        <hr>
-                        {% endblock %}
-                        <div class="actionscontainer">
+            {% endblock %}
+            <div class="three">
+                <div class="threecontainer">
+                    {% if bank_accounts %}
+                        <form method="post" action="{% url 'bank:change_primary_bank_account' %}">
+                            {% csrf_token %}
+                            {{ form.bank_account }}
+                            <input type="submit" value="Change primary bank account">
+                        </form>
+                    {% else %}
+                        <p>No bank accounts found.</p>
+                    {% endif %}
+                    {% block balance %}
+                        {% if account %}
+                            <h1>Current balance: <span
+                                    style="color: white">{{ account.balance }} {{ account.currency }}</span></h1>
+                            <hr>
+                        {% else %}
+                            <h1>No primary bank account set</h1>
+                        {% endif %}
+                    {% endblock %}
+                    <div class="actionscontainer">
                         {% block actions %}
                             <div class="actions">
                                 <h2>Account actions</h2>
@@ -93,29 +109,28 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </ul>
                             </div>
                         {% endblock %}
-                            <div class="functions">
-                                {% block functions %}
+                        <div class="functions">
+                            {% block functions %}
                                 <h2>Functions</h2>
                                 <div id="functionslayout">
-                                    <div class="butOne">
-                                        <h3>Outgoing payment</h3>
-                                    </div>
-                                    <div class="butTwo">
-                                        <h3>Incoming payment</h3>
-                                    </div>
-                                    <div class="butThree">
-                                        <h3>Recharge account</h3>
-                                    </div>
-                            <div class="butFour" id="admin_panel_link">
-                                        <h3>Admin <br>Panel</h3>
-                                    </div>
-                                    {% endblock %}
-                            {% block functionsMenu %}
-                                    <div class="functionsMenu">
-
-                                    </div>
-                            {% endblock %}
+                                <div class="butOne">
+                                    <h3>Outgoing payment</h3>
                                 </div>
+                                <div class="butTwo">
+                                    <h3>Incoming payment</h3>
+                                </div>
+                                <div class="butThree">
+                                    <h3>Recharge account</h3>
+                                </div>
+                                <div class="butFour" id="admin_panel_link">
+                                    <h3>Admin <br>Panel</h3>
+                                </div>
+                            {% endblock %}
+                            {% block functionsMenu %}
+                                <div class="functionsMenu">
+
+                                </div>
+                            {% endblock %}
                             </div>
                         </div>
                     </div>
@@ -123,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
     </div>
+</div>
 
 
 </body>
