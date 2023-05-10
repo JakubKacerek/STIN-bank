@@ -46,5 +46,6 @@ class Transaction(models.Model):
     destination_account = models.ForeignKey(BankAccount, on_delete=models.CASCADE, related_name="destination")
     timestamp = models.DateTimeField(auto_now_add=True)
     amount = models.DecimalField(max_digits=15, decimal_places=2)
-    currency = models.ForeignKey(BankAccount, on_delete=models.CASCADE)
+    currency = models.ForeignKey(CurrencyRate, on_delete=models.CASCADE)
     type = models.IntegerField(choices=TypeOfTransaction.choices)
+

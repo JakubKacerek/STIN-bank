@@ -21,23 +21,34 @@ class Currency:
 
 def getRates():
     url = 'https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/denni_kurz.txt'
-    response = requests.get(url)
-    rates = []
-    for line in response.text.split('\n')[2:-1]:
-        data = line.split('|')
-        rates.append(Currency(data[0], data[1], int(data[2]), data[3], float(data[4].replace(',', '.'))))
-    return tuple(rates)
+    try:
+        response = requests.get(url)
+        rates = []
+        for line in response.text.split('\n')[2:-1]:
+            data = line.split('|')
+            rates.append(Currency(data[0], data[1], int(data[2]), data[3], float(data[4].replace(',', '.'))))
+        return tuple(rates)
+    except requests.exceptions.ConnectionError:
+        return tuple()
 
 
 def saveRates():
-    for data in getRates():
-        currency = data.code
-        rate = data.rate
-        try:
-            obj, created = CurrencyRate.objects.update_or_create(
-                currency=currency,
-                defaults={'rate': rate}
-            )
-        except IntegrityError as e:
-            print(f"Error updating or creating CurrencyRate for currency {currency}: {e}")
+    try:
+        for data in getRates():
+            currency = data.code
+            rate = data.rate
+            try:
+                obj, created = CurrencyRate.objects.update_or_create(
+                    currency=currency,
+                    defaults={'rate': rate}
+                )
+            except IntegrityError as e:
+                print(f"Error updating or creating CurrencyRate for currency {currency}: {e}")
+    except requests.exceptions.ConnectionError:
+        pass
+
+    czk_rate, _ = CurrencyRate.objects.get_or_create(currency='CZK', defaults={'rate': 1})
+    if czk_rate.rate != 1:
+        czk_rate.rate = 1
+        czk_rate.save()
 
