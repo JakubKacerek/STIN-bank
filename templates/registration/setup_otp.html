@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+div {
+    display: flex;
+    width: 100%;
+    align-content: center;
+    justify-content: center;
+    font-size: 30px;
+}
+    </style>
+</head>
+<body>
+<div>
+    <h1>Scan this QR code in your 2FA application.</h1>
+</div>
+<div>
+    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+    <ol>
+        <li>Download any 2FA mobile application (Google authenticator, Authy, etc).</li>
+        <li>In the mobile app add an account and scan the QR code or input the secret key manually.</li>
+        <li>To ensure the 2FA is working, go back to the login page. <br>There you should be redirected to a page where you verify yourself with
+            the 2FA code.
+        </li>
+
+    </ol>
+</div>
+</body>
+</html>

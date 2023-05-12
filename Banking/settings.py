@@ -30,7 +30,10 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 LOGOUT_REDIRECT_URL = reverse_lazy('accounts:login')
-LOGIN_REDIRECT_URL = reverse_lazy('bank:dashboard')
+
+# settings.py
+LOGIN_URL = 'accounts:login'
+LOGIN_REDIRECT_URL = reverse_lazy('bank:verify_otp')
 
 # Application definition
 
@@ -45,6 +48,11 @@ INSTALLED_APPS = [
     'Banking',
     'bank',
     'accounts',
+    'django_otp',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +62,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 ]
 

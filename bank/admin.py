@@ -17,7 +17,7 @@ class CurrencyRateAdmin(admin.ModelAdmin):
 
 @admin.register(UserAccount)
 class UserAccountAdmin(admin.ModelAdmin):
-    list_display = ('user', 'bank_accounts_summary', 'primary_bank_account')
+    list_display = ('user', 'otp_enabled', 'bank_accounts_summary', 'primary_bank_account')
 
 
 @admin.register(Transaction)

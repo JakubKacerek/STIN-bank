@@ -13,6 +13,8 @@ class CurrencyRate(models.Model):
 
 class UserAccount(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    secret_key = models.CharField(max_length=50, null=True, blank=True)
+    otp_enabled = models.BooleanField(default=False)
     primary_bank_account = models.ForeignKey('BankAccount', on_delete=models.SET_NULL, null=True, blank=True,
                                              related_name='primary_account_of')
 

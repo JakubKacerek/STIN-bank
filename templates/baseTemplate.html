@@ -97,6 +97,7 @@
                 accountSettings.addEventListener("submit", function (event) {
                     event.preventDefault();
                     submitFormWithAjax(accountSettings);
+                    location.reload();
                 });
             }
         });
@@ -281,7 +282,7 @@
                                     </div>
                                     <!-- Withdrawal Form -->
                                     <div class="functionsMenu" id="withdrawalForm" style="display:none;">
-                                    <h1>Withdrawal</h1>
+                                        <h1>Withdrawal</h1>
                                         <form method="post" action="{% url 'bank:withdraw' %}">
                                             {% csrf_token %}
                                             <div class="form-group">
@@ -293,7 +294,7 @@
                                     </div>
                                     <!-- Recharge Form -->
                                     <div class="functionsMenu" id="rechargeForm" style="display:none;">
-                                    <h1>Recharge</h1>
+                                        <h1>Recharge</h1>
                                         <form method="post" action="{% url 'bank:recharge' %}">
                                             {% csrf_token %}
                                             <div class="form-group">
@@ -304,8 +305,8 @@
                                         </form>
                                     </div>
                                     <div class="functionsMenu" id="accountSettings" style="display:none;">
-                                    <h1>Account Settings</h1>
-                                    <p>Change displayed account</p>
+                                        <h1>Account Settings</h1>
+                                        <p>Change displayed account</p>
                                         {% if bank_accounts %}
                                             <form method="post" action="{% url 'bank:change_primary_bank_account' %}">
                                                 {% csrf_token %}
@@ -315,8 +316,10 @@
                                         {% else %}
                                             <p>No bank accounts found.</p>
                                         {% endif %}
+                                        <a href="{% url 'bank:setup_otp' %}">
+                                            <button>Setup OTP</button>
+                                        </a>
                                     </div>
-
                                 {% endblock %}
                             </div>
 
