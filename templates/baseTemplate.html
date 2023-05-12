@@ -166,6 +166,11 @@
                             <a href="{% url 'accounts:logout' %}">Logout</a>
                         </li>
                     </ul>
+                    {% if user.is_authenticated %}
+                        <p>Welcome, {{ user.username }}!</p>
+                    {% else %}
+                        <p>You are not logged in.</p>
+                    {% endif %}
                 </div>
                 <div class="two">
                     <div class="twocontainer">
@@ -269,15 +274,16 @@
                                         <form method="post" action="{% url 'bank:transaction' %}">
                                             {% csrf_token %}
                                             <div class="form-group">
-                                                <label for="{{ form_tr.amount.id_for_label }}">Amount:</label>
+                                                <label style="font-size: 20px" for="{{ form_tr.amount.id_for_label }}">Amount:</label>
                                                 {{ form_tr.amount }}
                                             </div>
                                             <div class="form-group">
-                                                <label for="{{ form_tr.target_account.id_for_label }}">Target
+                                                <label style="font-size: 20px"
+                                                       for="{{ form_tr.target_account.id_for_label }}">Target
                                                     Account:</label>
                                                 {{ form_tr.target_account }}
                                             </div>
-                                            <input type="submit" value="Submit">
+                                            <input style="border-radius: 10px; width: 50%" type="submit" value="Submit">
                                         </form>
                                     </div>
                                     <!-- Withdrawal Form -->
@@ -289,7 +295,7 @@
                                                 <label for="{{ form_withdrawal.amount.id_for_label }}">Amount:</label>
                                                 {{ form_withdrawal.amount }}
                                             </div>
-                                            <input type="submit" value="Submit">
+                                            <input style="border-radius: 10px; width: 50%" type="submit" value="Submit">
                                         </form>
                                     </div>
                                     <!-- Recharge Form -->
@@ -301,7 +307,8 @@
                                                 <label for="{{ form_recharge.amount.id_for_label }}">Amount:</label>
                                                 {{ form_recharge.amount }}
                                             </div>
-                                            <input type="submit" value="Recharge">
+                                            <input style="border-radius: 10px; width: 50%" type="submit"
+                                                   value="Recharge">
                                         </form>
                                     </div>
                                     <div class="functionsMenu" id="accountSettings" style="display:none;">

@@ -4,29 +4,47 @@
     <meta charset="UTF-8">
     <title>Document</title>
     <style>
-div {
-    display: flex;
-    width: 100%;
-    align-content: center;
-    justify-content: center;
-    font-size: 30px;
-}
+        div {
+            display: flex;
+            width: 100%;
+            align-content: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+
+        .otpSubmit {
+            display: flex;
+            width: 50%;
+            align-content: start;
+            justify-content: start;
+            font-size: 30px;
+            padding-left: 10%;
+        }
     </style>
 </head>
 <body>
 <div>
     <h1>Scan this QR code in your 2FA application.</h1>
 </div>
-<div>
-    <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+<div style="height: auto">
+    {% if qr_code %}
+        <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+    {% endif %}
     <ol>
         <li>Download any 2FA mobile application (Google authenticator, Authy, etc).</li>
         <li>In the mobile app add an account and scan the QR code or input the secret key manually.</li>
-        <li>To ensure the 2FA is working, go back to the login page. <br>There you should be redirected to a page where you verify yourself with
-            the 2FA code.
+        <li>To ensure the 2FA is working, insert your 2FA code below. <br>There you should be redirected to the home
+            page.
         </li>
-
     </ol>
+</div>
+<div class="otpSubmit">
+    <form method="post">
+        {% csrf_token %}
+        <label for="otp">Enter your OTP:</label><br>
+        <input type="text" id="otp" name="otp"><br>
+        <input type="submit" value="Submit">
+    </form>
 </div>
 </body>
 </html>

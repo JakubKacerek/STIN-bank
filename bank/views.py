@@ -5,16 +5,16 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, CreateView
 import pyotp
-from django_otp import login
+from django.contrib.auth import login as auth_login
+from django_otp import login as otp_login
 from django_otp.views import LoginView
 from pyotp import TOTP
-from sympy.parsing.sympy_parser import null
 
-from bank.forms import ChangePrimaryBankAccountForm, TransactionForm, WithdrawalForm, RechargeForm
+from bank.forms import ChangePrimaryBankAccountForm, TransactionForm, WithdrawalForm, RechargeForm, NewUserForm
 from bank.models import BankAccount, UserAccount, TypeOfTransaction, Transaction, CurrencyRate
 from bank.utils.cnbCurrencies import getRates, saveRates
 from django.http import JsonResponse
@@ -188,6 +188,13 @@ class RechargeView(LoginRequiredMixin, View):
 
 
 class CustomLoginView(LoginView):
+    @property
+    def authentication_form(self):
+        """
+        Return the default authentication form, bypassing the OTP check.
+        """
+        return self.form_class
+
     def form_valid(self, form):
         """If the form is valid, redirect to the supplied URL."""
         username = form.cleaned_data.get('username')
@@ -195,49 +202,81 @@ class CustomLoginView(LoginView):
         user = authenticate(self.request, username=username, password=password)
 
         if user is not None:
-            if user.useraccount.secret_key is null:
-                return self.form_valid(form)
-            else:
-                login(self.request, user)
+            auth_login(self.request, user)
+            if not user.useraccount.secret_key:
+                # Generate a new secret key and save it to the user's account
+                secret_key = pyotp.random_base32()
+                user.useraccount.secret_key = secret_key
+                user.useraccount.save()
+
+            if user.useraccount.otp_enabled:
                 return redirect('bank:verify_otp')
+            else:
+                return redirect('bank:setup_otp')
         else:
             return self.form_invalid(form)
 
 
 @login_required
 def setup_otp(request):
-    # Generate provisioning URI for use with the OTP authenticator app:
-    otp_auth_url = pyotp.totp.TOTP(request.user.useraccount.secret_key).provisioning_uri(
-        name=request.user.email,  # user email
-        issuer_name='YourAppName'  # your app name
-    )
+    if request.method == 'POST':
+        otp_attempt = request.POST.get('otp')
+        otp = pyotp.TOTP(request.user.useraccount.secret_key)
+        if otp.verify(otp_attempt):
+            request.user.useraccount.otp_enabled = True
+            request.user.useraccount.save()
+            messages.success(request, '2FA is set up successfully.')
+            return redirect('bank:dashboard')
+        else:
+            messages.error(request, 'Invalid OTP. Please try again.')
+            return redirect('bank:setup_otp')
+    else:
+        # Generate provisioning URI for use with the OTP authenticator app:
+        otp_auth_url = pyotp.totp.TOTP(request.user.useraccount.secret_key).provisioning_uri(
+            name=request.user.email,
+            issuer_name='YourAppName'  # your app name
+        )
 
-    # Generate QR code
-    qr_img = qrcode.make(otp_auth_url)
-    img = io.BytesIO()
+        # Generate QR code
+        qr_img = qrcode.make(otp_auth_url)
+        img = io.BytesIO()
 
-    # Save the qr_img (which is already a PIL Image object) directly as PNG
-    qr_img.save(img, 'PNG')
+        # Save the qr_img (which is already a PIL Image object) directly as PNG
+        qr_img.save(img, 'PNG')
 
-    img.seek(0)
-    img_b64 = base64.b64encode(img.read()).decode()
+        img.seek(0)
+        img_b64 = base64.b64encode(img.read()).decode()
 
-    context = {'qr_code': img_b64}
+        context = {'qr_code': img_b64}
 
-    return render(request, 'registration/setup_otp.html', context)
+        return render(request, 'registration/setup_otp.html', context)
+
 
 
 @login_required
 def verify_otp(request):
     if request.method == 'POST':
-        otp_attempt = request.POST.get('otp')  # get OTP from user input
+        otp_attempt = request.POST.get('otp')
         otp = TOTP(request.user.useraccount.secret_key)
 
         if otp.verify(otp_attempt):
-            messages.success(request, 'OTP verification successful.')
-            return redirect('bank:dashboard')  # redirect to dashboard after successful verification
+            return redirect('bank:dashboard')
         else:
-            messages.error(request, 'OTP verification failed.')
             return redirect('accounts:login')
 
     return render(request, 'registration/verify_otp.html')
+
+
+class RegisterUserView(CreateView):
+    form_class = NewUserForm
+    success_url = reverse_lazy('bank:login')
+    template_name = 'registration/registration.html'
+
+
+@login_required
+def check_otp_setup(request):
+    if request.user.useraccount.otp_enabled:
+        return redirect('bank:verify_otp')
+    else:
+        return redirect('bank:setup_otp')
+

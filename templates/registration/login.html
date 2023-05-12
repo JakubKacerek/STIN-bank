@@ -29,14 +29,7 @@
 <body>
 
 <div class="form-container">
-  <div class="form-wrapper">{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-
+  <div class="form-wrapper">
     <form method="post">
         {% csrf_token %}
       <div class="form-group">
@@ -50,9 +43,7 @@
       <button style="width: 250px; margin-top: 10px" type="submit" class="btn btn-primary">Login</button>
     </form>
     <p style="margin: 0;">Don't have our account yet?</p>
-      <a href="#" style="text-decoration: underline blue; cursor: pointer;">Click here to register!</a>
-    <p style="margin: 0;">Forgot your password?</p>
-      <a href="#" style="text-decoration: underline blue; cursor: pointer;">Click here to reset!</a>
+      <a href="{% url 'bank:register' %}" style="text-decoration: underline blue; cursor: pointer;">Click here to register!</a>
   </div>
 </div>
 </body>

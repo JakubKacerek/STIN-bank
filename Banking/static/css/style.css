@@ -225,5 +225,9 @@ body {
     grid-column: 1/5;
     grid-row: 2/4;
     aspect-ratio: 1;
-    
+}
+
+.submitButton {
+    width: 15%;
+    border-radius: 10px;
 }

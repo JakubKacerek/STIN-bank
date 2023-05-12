@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import HomeView, CustomLoginView
+from .views import HomeView, CustomLoginView, RegisterUserView
 from . import views
 
 app_name = 'bank'
@@ -14,4 +14,6 @@ urlpatterns = [
     path('recharge/', views.RechargeView.as_view(), name='recharge'),
     path('setup_otp/', views.setup_otp, name='setup_otp'),
     path('verify_otp/', views.verify_otp, name='verify_otp'),
+    path('register/', RegisterUserView.as_view(), name='register'),
+    path('check_otp_setup/', views.check_otp_setup, name='check_otp_setup'),
 ]

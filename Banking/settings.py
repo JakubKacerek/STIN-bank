@@ -33,7 +33,7 @@ LOGOUT_REDIRECT_URL = reverse_lazy('accounts:login')
 
 # settings.py
 LOGIN_URL = 'accounts:login'
-LOGIN_REDIRECT_URL = reverse_lazy('bank:verify_otp')
+LOGIN_REDIRECT_URL = reverse_lazy('bank:check_otp_setup')
 
 # Application definition
 
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'bank',
     'accounts',
     'django_otp',
+    'django_otp.plugins.otp_totp',
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -56,6 +57,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 MIDDLEWARE = [
+    'bank.twoFactorMiddleWare.TwoFactorAuthMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
