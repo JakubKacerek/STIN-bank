@@ -7,7 +7,7 @@ from bank.models import BankAccount, CurrencyRate, UserAccount, Transaction
 
 @admin.register(BankAccount)
 class BankAccountAdmin(admin.ModelAdmin):
-    list_display = ('user_account', 'balance', 'currency')
+    list_display = ('user_account','account_number', 'balance', 'currency')
 
 
 @admin.register(CurrencyRate)

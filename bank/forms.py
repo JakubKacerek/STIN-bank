@@ -1,8 +1,11 @@
+
+import random
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
-from bank.models import BankAccount, UserAccount
+from bank.models import BankAccount, UserAccount, CurrencyRate
 
 
 class ChangePrimaryBankAccountForm(forms.Form):
@@ -46,3 +49,33 @@ class NewUserForm(UserCreationForm):
             user.save()
             UserAccount.objects.create(user=user)
         return user
+
+
+class BankAccountForm(forms.ModelForm):
+
+    class Meta:
+        model = BankAccount
+        fields = ('currency',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['currency'].queryset = CurrencyRate.objects.all()
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.balance = self.cleaned_data.get('starting_amount')
+        instance.account_number = self.generate_account_number()
+        if commit:
+            instance.save()
+        return instance
+
+    @staticmethod
+    def generate_account_number():
+        # Generate a unique 11-digit account number
+        while True:
+            number = random.randint(10**10, 10**11 - 1)
+            if not BankAccount.objects.filter(account_number=number).exists():
+                return number
+
+
+

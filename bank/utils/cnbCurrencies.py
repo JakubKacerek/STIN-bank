@@ -8,6 +8,8 @@ from bank.models import CurrencyRate
 
 
 class Currency:
+    objects = None
+
     def __init__(self, country: str, currency: str, amount: int, code: str, rate: float):
         self.country = country
         self.currency = currency

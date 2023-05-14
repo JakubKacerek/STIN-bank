@@ -14,7 +14,8 @@ from django_otp import login as otp_login
 from django_otp.views import LoginView
 from pyotp import TOTP
 
-from bank.forms import ChangePrimaryBankAccountForm, TransactionForm, WithdrawalForm, RechargeForm, NewUserForm
+from bank.forms import ChangePrimaryBankAccountForm, TransactionForm, WithdrawalForm, RechargeForm, NewUserForm, \
+    BankAccountForm
 from bank.models import BankAccount, UserAccount, TypeOfTransaction, Transaction, CurrencyRate
 from bank.utils.cnbCurrencies import getRates, saveRates
 from django.http import JsonResponse
@@ -68,12 +69,34 @@ class HomeView(LoginRequiredMixin, TemplateView):
                                                in bank_accounts]
         context['form'] = form
 
+        # Add BankAccountForm to the context
+        context['form_bank_account'] = BankAccountForm()
+
         context['rates'] = getRates()
         saveRates()
 
         context['transactions'] = get_recent_transactions(user_account)
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        form = BankAccountForm(request.POST)
+        if form.is_valid():
+            currency = form.cleaned_data['currency']
+            user_account = request.user.useraccount
+            if BankAccount.objects.filter(user_account=user_account, currency=currency).exists():
+                messages.error(request, 'A bank account with this currency already exists.')
+                return self.get(request, *args, **kwargs)
+            else:
+                bank_account = form.save(commit=False)
+                bank_account.user_account = user_account
+                bank_account.balance = 0  # Set the initial balance to 0
+                bank_account.save()
+                messages.success(request, 'Bank account created successfully.')
+                return redirect('bank:dashboard')
+        else:
+            # If the form isn't valid, still return the page with the same context data
+            return self.get(request, *args, **kwargs)
 
 
 class ChangePrimaryBankAccountView(LoginRequiredMixin, View):
@@ -252,7 +275,6 @@ def setup_otp(request):
         return render(request, 'registration/setup_otp.html', context)
 
 
-
 @login_required
 def verify_otp(request):
     if request.method == 'POST':
@@ -280,3 +302,16 @@ def check_otp_setup(request):
     else:
         return redirect('bank:setup_otp')
 
+
+@login_required
+def create_bank_account(request):
+    if request.method == 'POST':
+        form = BankAccountForm(request.POST)
+        if form.is_valid():
+            bank_account = form.save(commit=False)
+            bank_account.user = request.user
+            bank_account.save()
+            return redirect('bank:dashboard')
+    else:
+        form = BankAccountForm()
+    return render(request, 'bank/create_bank_account.html', {'form': form})

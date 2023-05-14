@@ -323,9 +323,15 @@
                                         {% else %}
                                             <p>No bank accounts found.</p>
                                         {% endif %}
-                                        <a href="{% url 'bank:setup_otp' %}">
-                                            <button>Setup OTP</button>
-                                        </a>
+                                        <p>Create a new bank account</p>
+                                        <form method="post" action="{% url 'bank:dashboard' %}">
+                                            {% csrf_token %}
+                                            <div>
+                                                <label for="{{ form_bank_account.currency.id_for_label }}">Currency:</label>
+                                                {{ form_bank_account.currency }}
+                                            </div>
+                                            <input type="submit" value="Create Bank Account">
+                                        </form>
                                     </div>
                                 {% endblock %}
                             </div>
