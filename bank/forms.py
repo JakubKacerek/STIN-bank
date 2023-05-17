@@ -71,7 +71,6 @@ class BankAccountForm(forms.ModelForm):
 
     @staticmethod
     def generate_account_number():
-        # Generate a unique 11-digit account number
         while True:
             number = random.randint(10**10, 10**11 - 1)
             if not BankAccount.objects.filter(account_number=number).exists():
