@@ -1,1 +1,1 @@
-web gunicorn Banking.wsgi:application --log-file -
+web:gunicorn Banking.wsgi
