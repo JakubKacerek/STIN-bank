@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure--+ry%1trkj(o$6)%h$*-8@!xu6&l^@--sov*%ucp5te@f16*nr
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1','https://stin-kacerek.herokuapp.com/']
 
 LOGOUT_REDIRECT_URL = reverse_lazy('accounts:login')
 
