@@ -1,6 +1,6 @@
-#STIN BANK
+# STIN BANK
 
-##To-Do
+## To-Do
 
 - [x] **Transakce**
 - [x] **Withdrawal**
@@ -13,6 +13,6 @@
 - [x] **Currency Rates**
 
 
-##Test coverage
+## Test coverage
 
 ![Test Coverage](https://img.shields.io/badge/Test%20Coverage-71%25-brightgreen)
