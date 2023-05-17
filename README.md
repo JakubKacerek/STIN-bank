@@ -2,15 +2,15 @@
 
 ##To-Do
 
-[x] **Transakce**
-[x] **Withdrawal**
-[x] **Deposit**
-[x] **Balance**
-[x] **Transaction History**
-[x] **User Registration**
-[x] **Bank Account Creation**
-[x] **2FA**
-[x] **Currency Rates**
+- [x] **Transakce**
+- [x] **Withdrawal**
+- [x] **Deposit**
+- [x] **Balance**
+- [x] **Transaction History**
+- [x] **User Registration**
+- [x] **Bank Account Creation**
+- [x] **2FA**
+- [x] **Currency Rates**
 
 
 ##Test coverage
