@@ -1,0 +1,233 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #222;
+    color: #aaa;
+    box-sizing: border-box;
+    font-family: 'Bebas Neue', cursive;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.container {
+    width: 100%;
+    margin: auto;
+}
+
+.subcontainer {
+    display: flex;
+    justify-content: center;
+    margin: 30px auto;
+    width: 95%;
+}
+
+#layout {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 33%;
+    grid-gap: 6px;
+    grid-auto-rows: 107px;
+    height: 90vh;
+}
+
+.one {
+    grid-column: 1;
+    grid-row: 1;
+    border-radius: 10px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-top-right-radius: 3px;
+    background-color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.container .subcontainer #layout ul {
+    list-style-type: none;
+}
+
+.container .subcontainer #layout ul li {
+    width: 300px;
+    margin: 3px;
+}
+
+
+.container .subcontainer #layout ul li a {
+    text-decoration: none;
+    font-size: 20px;
+    color: #aaa;
+    transition: color 0.6s ease;
+}
+
+.container .subcontainer #layout ul li a:hover {
+    color: #fff;
+}
+
+.two {
+    grid-column: 1;
+    grid-row: 2/9;
+    border-radius: 3px;
+    border-bottom-left-radius: 10px;
+    background-color: #333;
+    display: flex;
+    justify-content: center;
+}
+
+.container .subcontainer #layout .two h2 {
+    margin: 0px;
+    text-decoration: underline;
+}
+
+.three {
+    grid-column: 2/5;
+    grid-row: 1/9;
+    background-color: #444;
+    border-radius: 10px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.twocontainer {
+    margin: 10px;
+    width: 90%;
+}
+
+#rates {
+    color: #fff;
+}
+
+.reload {
+    transition: all 0.3s ease;
+}
+
+.reload:hover{
+    cursor: pointer;
+    color: white;
+}
+
+.paddingBetweenCols {
+    margin-top: 10px;
+}
+
+.paddingBetweenCols td {
+    padding: 0 15px;
+}
+
+.threecontainer {
+    width: 90%;
+    height: 90%;
+}
+
+.threecontainer hr {
+    background-color: #bbb;
+    height: 1px;
+    border: none;
+}
+
+.actionscontainer {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 50%;
+    grid-gap: 6px;
+    grid-auto-rows: 755px;
+}
+
+.actions {
+    
+    grid-row: 1;
+    grid-column: 1;
+}
+
+.actionscontainer h2 {
+    margin: 0;
+    text-decoration: underline;
+}
+
+.functions {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+#functionslayout {
+    margin-top: 10px;
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 6px;
+}
+
+#functionslayout div {
+    background-color: #555;
+    font-size: 13px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    border-radius: 3px;
+}
+
+.butOne {
+    grid-column: 1;
+    grid-row: 1;
+    aspect-ratio: 1;
+    transition: all 0.3s ease;
+}
+
+
+.butOne:hover {
+    transform: scale(1.06);
+    cursor: pointer;
+    color: white;
+}
+
+.butTwo {
+    grid-column: 2;
+    aspect-ratio: 1;
+    grid-row: 1;
+    transition: all 0.3s ease;
+}
+
+.butTwo:hover {
+    transform: scale(1.06);
+    cursor: pointer;
+    color: white;
+}
+
+.butThree {
+    grid-column: 3;
+    grid-row: 1;
+    aspect-ratio: 1;
+    transition: all 0.3s ease;
+}
+
+.butThree:hover {
+    transform: scale(1.06);
+    cursor: pointer;
+    color: white;
+}
+
+.butFour {
+    grid-column: 4;
+    grid-row: 1;
+    aspect-ratio: 1;
+    transition: all 0.3s ease;
+}
+
+.butFour:hover {
+    transform: scale(1.06);
+    cursor: pointer;
+    color: white;
+}
+
+.functionsMenu {
+    grid-column: 1/5;
+    grid-row: 2/4;
+    aspect-ratio: 1;
+}
+
+.submitButton {
+    width: 15%;
+    border-radius: 10px;
+}
