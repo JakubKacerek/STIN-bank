@@ -104,8 +104,12 @@ WSGI_APPLICATION = 'Banking.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'd62eakcfa2fqcj',
+        'USER': 'xcyqconkmdpuss',
+        'PASSWORD': 'b5eb554862de0486465f2c3035f3622482dc413a6f300d2eff2d9478b914bba9',
+        'HOST': 'ec2-99-80-190-165.eu-west-1.compute.amazonaws.com',
+        'PORT': '5432',
     }
 }
 
