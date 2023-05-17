@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 
 from celery.schedules import crontab
-
+import django_heroku
+import dj_database_url
 from .celery import app as celery_app
 from django.contrib import messages
 from django.urls import reverse_lazy
@@ -30,7 +31,7 @@ SECRET_KEY = 'django-insecure--+ry%1trkj(o$6)%h$*-8@!xu6&l^@--sov*%ucp5te@f16*nr
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 LOGOUT_REDIRECT_URL = reverse_lazy('accounts:login')
 
@@ -149,6 +150,9 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+django_heroku.settings(locals())
 
 CELERY_BEAT_SCHEDULE = {
     'update_rates': {
