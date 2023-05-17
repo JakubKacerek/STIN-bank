@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        div{
+            margin: 0 auto;
+            width: 50%;
+            text-align: center;
+            justify-content: center;
+    }
+        .inputField {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            text-align: center;
+            border-radius: 16px;
+        }
+        .submitButton {
+            width: 20%;
+            background-color: #4287f5;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border-radius: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <form method="post">
+        {% csrf_token %}
+        <input class="inputField" type="text" name="otp" placeholder="Enter your code here."><br>
+        <input class="submitButton" type="submit" value="Verify OTP">
+    </form>
+    <h2>Don't have your 2FA setup yet? Click here to set it up!</h2>
+    <a href="{% url 'bank:setup_otp' %}">Setup 2FA</a>
+</div>
+</body>
+</html>

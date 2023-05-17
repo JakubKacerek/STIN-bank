@@ -1,0 +1,348 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300&display=swap"
+          rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}
+            Online banking
+        {% endblock %}
+    </title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var adminPanelDiv = document.getElementById("admin_panel_link");
+            if (adminPanelDiv) {
+                adminPanelDiv.addEventListener("click", function () {
+                    window.location.href = "/admin/";
+                });
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var toggleTransactionFormDiv = document.querySelector(".butOne");
+            if (toggleTransactionFormDiv) {
+                toggleTransactionFormDiv.addEventListener("click", function () {
+                    toggleFormVisibility("transactionForm");
+                    hideForm("withdrawalForm");
+                    hideForm("rechargeForm");
+                    hideForm("accountSettings");
+                });
+            }
+
+            var toggleWithdrawalFormDiv = document.querySelector(".butTwo");
+            if (toggleWithdrawalFormDiv) {
+                toggleWithdrawalFormDiv.addEventListener("click", function () {
+                    toggleFormVisibility("withdrawalForm");
+                    hideForm("transactionForm");
+                    hideForm("rechargeForm");
+                    hideForm("accountSettings");
+                });
+            }
+
+            var toggleRechargeFormDiv = document.querySelector(".butThree");
+            if (toggleRechargeFormDiv) {
+                toggleRechargeFormDiv.addEventListener("click", function () {
+                    toggleFormVisibility("rechargeForm");
+                    hideForm("transactionForm");
+                    hideForm("withdrawalForm");
+                    hideForm("accountSettings");
+                });
+            }
+
+            var toggleAccountSettings = document.querySelector(".butFour");
+            if (toggleAccountSettings) {
+                toggleAccountSettings.addEventListener("click", function () {
+                    toggleFormVisibility("accountSettings")
+                    hideForm("rechargeForm");
+                    hideForm("transactionForm");
+                    hideForm("withdrawalForm");
+                });
+            }
+
+            // Add event listeners for form submissions
+            var transactionForm = document.querySelector("#transactionForm form");
+            if (transactionForm) {
+                transactionForm.addEventListener("submit", function (event) {
+                    event.preventDefault();
+                    submitFormWithAjax(transactionForm);
+                });
+            }
+
+            var withdrawalForm = document.querySelector("#withdrawalForm form");
+            if (withdrawalForm) {
+                withdrawalForm.addEventListener("submit", function (event) {
+                    event.preventDefault();
+                    submitFormWithAjax(withdrawalForm);
+                });
+            }
+
+            var rechargeForm = document.querySelector("#rechargeForm form");
+            if (rechargeForm) {
+                rechargeForm.addEventListener("submit", function (event) {
+                    event.preventDefault();
+                    submitFormWithAjax(rechargeForm);
+                });
+            }
+
+            var accountSettings = document.querySelector("#accountSettings form");
+            if (accountSettings) {
+                accountSettings.addEventListener("submit", function (event) {
+                    event.preventDefault();
+                    submitFormWithAjax(accountSettings);
+                    location.reload();
+                });
+            }
+        });
+
+        function toggleFormVisibility(formId) {
+            var form = document.getElementById(formId);
+            if (form.style.display === "none") {
+                form.style.display = "block";
+            } else {
+                form.style.display = "none";
+            }
+        }
+
+        function hideForm(formId) {
+            var form = document.getElementById(formId);
+            form.style.display = "none";
+        }
+
+        function submitFormWithAjax(form) {
+            var formData = new FormData(form);
+            var request = new XMLHttpRequest();
+            request.open("POST", form.action);
+            request.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+            request.setRequestHeader("X-CSRFToken", getCsrfToken());
+
+            request.onload = function () {
+                if (request.status === 200) {
+                    var response = JSON.parse(request.responseText);
+                    if (response.error) {
+                        alert(response.error);
+                    } else {
+                        if (response.success) {
+                            alert(response.success);
+                        }
+                        // Reload the page to update the account balance
+                        window.location.reload();
+                    }
+                } else {
+                    alert("An error occurred. Please try again.");
+                }
+            };
+
+
+            request.send(formData);
+        }
+
+        function getCsrfToken() {
+            var csrfToken = document.getElementsByName("csrfmiddlewaretoken")[0];
+            return csrfToken.value;
+        }
+    </script>
+
+</head>
+
+<body>
+<div class="container">
+    <div class="subcontainer">
+        <div id="layout">
+            {% block kokot1 %}
+                <div class="one">
+                    <ul>
+                        <li>
+                            <a href="#">&#10147; <span style="text-decoration: underline;">Overview</span></a>
+                        </li>
+                        <li>
+                            <a href="{% url 'accounts:logout' %}">Logout</a>
+                        </li>
+                    </ul>
+                    {% if user.is_authenticated %}
+                        <p>Welcome, {{ user.username }}!</p>
+                    {% else %}
+                        <p>You are not logged in.</p>
+                    {% endif %}
+                </div>
+                <div class="two">
+                    <div class="twocontainer">
+                        <h2>
+                            Exchange rates
+                        </h2>
+                        {% block exchRates %}
+                            <table class="paddingBetweenCols">
+                                <tr>
+                                    <th>State</th>
+                                    <th>Currency</th>
+                                    <th>Amount</th>
+                                    <th>Code</th>
+                                    <th>Rate</th>
+                                </tr>
+                                {% for rate in rates %}
+                                    <tr>
+                                        <td>{{ rate.country }}</td>
+                                        <td>{{ rate.currency }}</td>
+                                        <td style="text-align: end;">{{ rate.amount }}</td>
+                                        <td style="text-align: center;">{{ rate.code }}</td>
+                                        <td style="text-align: start">{{ rate.rate }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        {% endblock %}
+                    </div>
+                </div>
+            {% endblock %}
+            <div class="three">
+                <div class="threecontainer">
+
+                    {% block balance %}
+                        {% if account %}
+                            <h1>Current balance: <span
+                                    style="color: white">{{ account.balance }} {{ account.currency }}</span></h1>
+                            <hr>
+                        {% else %}
+                            <h1>No primary bank account set</h1>
+                        {% endif %}
+                    {% endblock %}
+                    <div class="actionscontainer">
+                        {% block actions %}
+                            <div class="actions">
+                                <h2>Account actions</h2>
+                                <ul>
+                                    {% for transaction in transactions %}
+                                        <li>
+                                            {% if transaction.type == 2 %}
+                                                {% if transaction.source_account == account %}
+                                                    - [{{ transaction.timestamp }}]<br>
+                                                    <span style="color: white">Outgoing:</span> -
+                                                    {{ transaction.amount }} {{ transaction.currency }}
+                                                    to {{ transaction.destination_account.user_account }}
+                                                    <hr>
+                                                {% else %}
+                                                    - [{{ transaction.timestamp }}]<br>
+                                                    <span style="color: white">Incoming:</span> +
+                                                    {{ transaction.amount }} {{ transaction.currency }}
+                                                    from {{ transaction.source_account.user_account }}
+                                                    <hr>
+                                                {% endif %}
+                                            {% elif transaction.type == 1 %}
+                                                - [{{ transaction.timestamp }}]<br>
+                                                <span style="color: white">Withdrawal:</span> - {{ transaction.amount }}
+                                                {{ transaction.currency }}
+                                                <hr>
+                                            {% elif transaction.type == 0 %}
+                                                - [{{ transaction.timestamp }}]<br>
+                                                <span style="color: white">Deposit:</span> + {{ transaction.amount }}
+                                                {{ transaction.currency }}
+                                                <hr>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endblock %}
+                        <div class="functions">
+                            {% block functions %}
+                                <h2>Functions</h2>
+                                <div id="functionslayout">
+                                <div class="butOne" id="toggleTransactionForm">
+                                    <h3>Transaction</h3>
+                                </div>
+                                <div class="butTwo">
+                                    <h3>Withdrawal</h3>
+                                </div>
+                                <div class="butThree">
+                                    <h3>Deposit</h3>
+                                </div>
+                                <div class="butFour">
+                                    <h3>Account <br>settings</h3>
+                                </div>
+                            {% endblock %}
+                            <div class="functionsMenu">
+                                {% block functionsMenu %}
+                                    <!-- Transaction Form -->
+                                    <div class="functionsMenu" id="transactionForm" style="display:none;">
+                                        <h1>Transaction</h1>
+                                        <form method="post" action="{% url 'bank:transaction' %}">
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <label style="font-size: 20px" for="{{ form_tr.amount.id_for_label }}">Amount:</label>
+                                                {{ form_tr.amount }}
+                                            </div>
+                                            <div class="form-group">
+                                                <label style="font-size: 20px"
+                                                       for="{{ form_tr.target_account.id_for_label }}">Target
+                                                    Account:</label>
+                                                {{ form_tr.target_account }}
+                                            </div>
+                                            <input style="border-radius: 10px; width: 50%" type="submit" value="Submit">
+                                        </form>
+                                    </div>
+                                    <!-- Withdrawal Form -->
+                                    <div class="functionsMenu" id="withdrawalForm" style="display:none;">
+                                        <h1>Withdrawal</h1>
+                                        <form method="post" action="{% url 'bank:withdraw' %}">
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <label for="{{ form_withdrawal.amount.id_for_label }}">Amount:</label>
+                                                {{ form_withdrawal.amount }}
+                                            </div>
+                                            <input style="border-radius: 10px; width: 50%" type="submit" value="Submit">
+                                        </form>
+                                    </div>
+                                    <!-- Recharge Form -->
+                                    <div class="functionsMenu" id="rechargeForm" style="display:none;">
+                                        <h1>Recharge</h1>
+                                        <form method="post" action="{% url 'bank:recharge' %}">
+                                            {% csrf_token %}
+                                            <div class="form-group">
+                                                <label for="{{ form_recharge.amount.id_for_label }}">Amount:</label>
+                                                {{ form_recharge.amount }}
+                                            </div>
+                                            <input style="border-radius: 10px; width: 50%" type="submit"
+                                                   value="Recharge">
+                                        </form>
+                                    </div>
+                                    <div class="functionsMenu" id="accountSettings" style="display:none;">
+                                        <h1>Account Settings</h1>
+                                        <p>Change displayed account</p>
+                                        {% if bank_accounts %}
+                                            <form method="post" action="{% url 'bank:change_primary_bank_account' %}">
+                                                {% csrf_token %}
+                                                {{ form.bank_account }}
+                                                <input type="submit" value="Change primary bank account">
+                                            </form>
+                                        {% else %}
+                                            <p>No bank accounts found.</p>
+                                        {% endif %}
+                                        <p>Create a new bank account</p>
+                                        <form method="post" action="{% url 'bank:dashboard' %}">
+                                            {% csrf_token %}
+                                            <div>
+                                                <label for="{{ form_bank_account.currency.id_for_label }}">Currency:</label>
+                                                {{ form_bank_account.currency }}
+                                            </div>
+                                            <input type="submit" value="Create Bank Account">
+                                        </form>
+                                    </div>
+                                {% endblock %}
+                            </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
