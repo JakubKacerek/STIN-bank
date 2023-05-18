@@ -13,7 +13,7 @@ import os
 from pathlib import Path
 
 from celery.schedules import crontab
-
+import psycopg2
 from .celery import app as celery_app
 from django.contrib import messages
 from django.urls import reverse_lazy
