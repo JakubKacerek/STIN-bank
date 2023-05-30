@@ -10,16 +10,13 @@ from django.views import View
 from django.views.generic import TemplateView, CreateView
 import pyotp
 from django.contrib.auth import login as auth_login
-from django_otp import login as otp_login
 from django_otp.views import LoginView
 from pyotp import TOTP
-
 from bank.forms import ChangePrimaryBankAccountForm, TransactionForm, WithdrawalForm, RechargeForm, NewUserForm, \
     BankAccountForm
 from bank.models import BankAccount, UserAccount, TypeOfTransaction, Transaction, CurrencyRate
 from bank.utils.cnbCurrencies import getRates, saveRates
 from django.http import JsonResponse
-
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 import qrcode
@@ -113,6 +110,14 @@ class ChangePrimaryBankAccountView(LoginRequiredMixin, View):
         return HttpResponseRedirect(reverse('bank:dashboard'))
 
 
+def is_valid_amount(account, amount):
+    return amount <= account.balance + account.balance * Decimal('0.1')
+
+
+def calculate_overdraft_fee(account, amount):
+    return max(Decimal('0'), amount - account.balance) * Decimal('0.1')
+
+
 class TransactionView(LoginRequiredMixin, TemplateView):
     template_name = "transaction.html"
 
@@ -126,34 +131,50 @@ class TransactionView(LoginRequiredMixin, TemplateView):
         user_account = UserAccount.objects.get(user=request.user)
         target_accounts = BankAccount.objects.exclude(user_account=user_account)
         form = TransactionForm(request.POST, target_accounts=target_accounts)
+
         if form.is_valid():
             target_account = form.cleaned_data['target_account']
-            amount = form.cleaned_data['amount']
-            source_account = UserAccount.objects.get(user=request.user).primary_bank_account
-            if source_account.balance < amount:
-                return JsonResponse({"error": "Insufficient funds."})
+            amount_in_chosen_currency = form.cleaned_data['amount']
+            chosen_currency = form.cleaned_data['currency']
+
+            source_account_in_chosen_currency = BankAccount.objects.filter(user_account=user_account,
+                                                                           currency=chosen_currency).first()
+
+            if source_account_in_chosen_currency and source_account_in_chosen_currency.balance >= amount_in_chosen_currency:
+                source_account = source_account_in_chosen_currency
+                amount_to_deduct = amount_in_chosen_currency
             else:
+                source_account = user_account.primary_bank_account
+
                 source_currency_rate = CurrencyRate.objects.get(currency=source_account.currency.currency)
-                target_currency_rate = CurrencyRate.objects.get(currency=target_account.currency.currency)
+                chosen_currency_rate = CurrencyRate.objects.get(currency=chosen_currency.currency)
 
-                amount_in_czk = amount * Decimal(source_currency_rate.rate)
-                amount_in_target_currency = amount_in_czk / Decimal(target_currency_rate.rate)
+                amount_in_czk = amount_in_chosen_currency * Decimal(chosen_currency_rate.rate)
+                amount_to_deduct = amount_in_czk / Decimal(source_currency_rate.rate)
 
-                source_account.balance -= amount
-                source_account.save()
-                target_account.balance += amount_in_target_currency
-                target_account.save()
+                if not is_valid_amount(source_account, amount_to_deduct):
+                    return JsonResponse({"error": "Insufficient funds."})
 
-                transaction = Transaction(
-                    source_account=source_account,
-                    destination_account=target_account,
-                    amount=amount,
-                    currency=source_account.currency,  # Change this line
-                    type=TypeOfTransaction.TRA
-                )
-                transaction.save()
+            overdraft_fee = calculate_overdraft_fee(source_account, amount_to_deduct)
 
-                return JsonResponse({"success": "Transaction complete."})
+            source_account.balance -= amount_to_deduct + overdraft_fee
+            source_account.save()
+
+            target_account.balance += amount_in_chosen_currency
+            target_account.save()
+
+            transaction = Transaction(
+                source_account=source_account,
+                destination_account=target_account,
+                amount=amount_in_chosen_currency,
+                currency=chosen_currency,
+                type=TypeOfTransaction.TRA,
+                overdraft_fee=overdraft_fee
+            )
+            transaction.save()
+
+            return JsonResponse({"success": "Transaction complete."})
+
         else:
             return JsonResponse({"error": "Failed to complete the transaction. Please try again."})
 
@@ -162,21 +183,28 @@ class WithdrawalView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = WithdrawalForm(request.POST)
         if form.is_valid():
-            amount = form.cleaned_data['amount']
+            amount_in_chosen_currency = form.cleaned_data['amount']
+            chosen_currency = form.cleaned_data['currency']
             user_account = UserAccount.objects.get(user=request.user)
             source_account = user_account.primary_bank_account
 
-            if source_account.balance < amount:
+            chosen_currency_rate = CurrencyRate.objects.get(currency=chosen_currency.currency)
+            source_currency_rate = CurrencyRate.objects.get(currency=source_account.currency.currency)
+
+            amount_in_czk = amount_in_chosen_currency * Decimal(chosen_currency_rate.rate)
+            amount_to_deduct = amount_in_czk / Decimal(source_currency_rate.rate)
+
+            if source_account.balance < amount_to_deduct:
                 return JsonResponse({"error": "Insufficient funds."})
             else:
-                source_account.balance -= amount
+                source_account.balance -= amount_to_deduct
                 source_account.save()
 
                 transaction = Transaction(
                     source_account=source_account,
                     destination_account=source_account,
-                    amount=amount,
-                    currency=source_account.currency,
+                    amount=amount_in_chosen_currency,
+                    currency=chosen_currency,
                     type=TypeOfTransaction.WIT
                 )
                 transaction.save()
@@ -189,18 +217,25 @@ class RechargeView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = RechargeForm(request.POST)
         if form.is_valid():
-            amount = form.cleaned_data['amount']
+            amount_in_chosen_currency = form.cleaned_data['amount']
+            chosen_currency = form.cleaned_data['currency']
             user_account = UserAccount.objects.get(user=request.user)
             source_account = user_account.primary_bank_account
 
-            source_account.balance += amount
+            chosen_currency_rate = CurrencyRate.objects.get(currency=chosen_currency.currency)
+            source_currency_rate = CurrencyRate.objects.get(currency=source_account.currency.currency)
+
+            amount_in_czk = amount_in_chosen_currency * Decimal(chosen_currency_rate.rate)
+            amount_to_add = amount_in_czk / Decimal(source_currency_rate.rate)
+
+            source_account.balance += amount_to_add
             source_account.save()
 
             transaction = Transaction(
                 source_account=source_account,
                 destination_account=source_account,
-                amount=amount,
-                currency=source_account.currency,
+                amount=amount_in_chosen_currency,
+                currency=chosen_currency,
                 type=TypeOfTransaction.DEP
             )
             transaction.save()

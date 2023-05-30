@@ -51,4 +51,5 @@ class Transaction(models.Model):
     amount = models.DecimalField(max_digits=15, decimal_places=2)
     currency = models.ForeignKey(CurrencyRate, on_delete=models.CASCADE)
     type = models.IntegerField(choices=TypeOfTransaction.choices)
+    overdraft_fee = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 

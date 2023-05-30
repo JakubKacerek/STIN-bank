@@ -276,6 +276,7 @@
                                             <div class="form-group">
                                                 <label style="font-size: 20px" for="{{ form_tr.amount.id_for_label }}">Amount:</label>
                                                 {{ form_tr.amount }}
+                                                {{ form_tr.currency }}
                                             </div>
                                             <div class="form-group">
                                                 <label style="font-size: 20px"
@@ -294,6 +295,7 @@
                                             <div class="form-group">
                                                 <label for="{{ form_withdrawal.amount.id_for_label }}">Amount:</label>
                                                 {{ form_withdrawal.amount }}
+                                                {{ form_withdrawal.currency }}
                                             </div>
                                             <input style="border-radius: 10px; width: 50%" type="submit" value="Submit">
                                         </form>
@@ -306,6 +308,7 @@
                                             <div class="form-group">
                                                 <label for="{{ form_recharge.amount.id_for_label }}">Amount:</label>
                                                 {{ form_recharge.amount }}
+                                                {{ form_recharge.currency }}
                                             </div>
                                             <input style="border-radius: 10px; width: 50%" type="submit"
                                                    value="Recharge">

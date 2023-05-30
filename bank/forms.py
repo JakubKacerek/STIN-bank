@@ -1,4 +1,3 @@
-
 import random
 
 from django import forms
@@ -20,6 +19,7 @@ class ChangePrimaryBankAccountForm(forms.Form):
 class TransactionForm(forms.Form):
     target_account = forms.ModelChoiceField(queryset=BankAccount.objects.none(), empty_label=None)
     amount = forms.DecimalField(max_digits=15, decimal_places=2)
+    currency = forms.ModelChoiceField(queryset=CurrencyRate.objects.all())
 
     def __init__(self, *args, target_accounts=None, **kwargs):
         super().__init__(*args, **kwargs)
@@ -29,10 +29,12 @@ class TransactionForm(forms.Form):
 
 class WithdrawalForm(forms.Form):
     amount = forms.DecimalField(max_digits=15, decimal_places=2)
+    currency = forms.ModelChoiceField(queryset=CurrencyRate.objects.all())
 
 
 class RechargeForm(forms.Form):
     amount = forms.DecimalField(max_digits=15, decimal_places=2)
+    currency = forms.ModelChoiceField(queryset=CurrencyRate.objects.all())
 
 
 class NewUserForm(UserCreationForm):
@@ -52,7 +54,6 @@ class NewUserForm(UserCreationForm):
 
 
 class BankAccountForm(forms.ModelForm):
-
     class Meta:
         model = BankAccount
         fields = ('currency',)
@@ -72,9 +73,6 @@ class BankAccountForm(forms.ModelForm):
     @staticmethod
     def generate_account_number():
         while True:
-            number = random.randint(10**10, 10**11 - 1)
+            number = random.randint(10 ** 10, 10 ** 11 - 1)
             if not BankAccount.objects.filter(account_number=number).exists():
                 return number
-
-
-
