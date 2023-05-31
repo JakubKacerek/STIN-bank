@@ -120,7 +120,7 @@ else:
             'HOST': 'ec2-99-80-190-165.eu-west-1.compute.amazonaws.com',
             'PORT': '5432',
         }
-
+}
 
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
