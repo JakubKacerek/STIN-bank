@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 from celery.schedules import crontab
-
+import psycopg2
 from .celery import app as celery_app
 from django.contrib import messages
 from django.urls import reverse_lazy
@@ -31,7 +31,7 @@ SECRET_KEY = 'django-insecure--+ry%1trkj(o$6)%h$*-8@!xu6&l^@--sov*%ucp5te@f16*nr
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 LOGOUT_REDIRECT_URL = reverse_lazy('accounts:login')
 
@@ -120,7 +120,7 @@ else:
             'HOST': 'ec2-99-80-190-165.eu-west-1.compute.amazonaws.com',
             'PORT': '5432',
         }
-    }
+
 
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
