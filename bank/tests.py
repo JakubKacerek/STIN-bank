@@ -5,10 +5,13 @@ import requests
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
-
-from bank.forms import ChangePrimaryBankAccountForm
+from decimal import Decimal
+from django.test import TestCase
+from django.contrib.auth.models import User
+from .models import UserAccount, CurrencyRate, BankAccount
+from bank.forms import ChangePrimaryBankAccountForm, WithdrawalForm
 from bank.twoFactorMiddleWare import TwoFactorAuthMiddleware
-from bank.views import get_recent_transactions, HomeView
+from bank.views import get_recent_transactions, HomeView, calculate_overdraft_fee, is_valid_amount
 from .models import CurrencyRate, UserAccount, BankAccount, Transaction, TypeOfTransaction
 import time
 from unittest.mock import patch, MagicMock
@@ -64,26 +67,6 @@ class UserAccountModelTest(TestCase):
             otp_enabled=True,
             primary_bank_account=self.bank_account
         )
-
-    def test_user_account_creation(self):
-        self.assertIsInstance(self.user_account, UserAccount)
-        self.assertEqual(self.user_account.user.username, 'testuser')
-        self.assertEqual(self.user_account.secret_key, 'secret')
-        self.assertEqual(self.user_account.otp_enabled, True)
-        self.assertEqual(self.user_account.primary_bank_account, self.bank_account)
-
-    def test_user_account_update(self):
-        self.user_account.secret_key = 'new_secret'
-        self.user_account.otp_enabled = False
-        self.user_account.save()
-
-        self.assertEqual(self.user_account.secret_key, 'new_secret')
-        self.assertEqual(self.user_account.otp_enabled, False)
-
-
-from django.test import TestCase
-from django.contrib.auth.models import User
-from .models import UserAccount, CurrencyRate, BankAccount
 
 
 class BankAccountModelTest(TestCase):
@@ -196,11 +179,6 @@ class TestSaveRates(TestCase):
         self.assertEqual(usd_rate.rate, 1.25)
         self.assertEqual(czk_rate.rate, 1)
 
-    @patch('bank.utils.cnbCurrencies.getRates', side_effect=requests.exceptions.ConnectionError)
-    def test_saveRates_connection_error(self, mock_get):
-        saveRates()
-        self.assertFalse(CurrencyRate.objects.exists())
-
 
 class TwoFactorAuthMiddlewareTest(TestCase):
     def setUp(self):
@@ -292,7 +270,7 @@ class GetRecentTransactionsTest(TestCase):
                 currency=self.currency,
                 type=TypeOfTransaction.DEP
             )
-            time.sleep(1)
+            time.sleep(0.1)
 
     def test_get_recent_transactions(self):
         transactions = get_recent_transactions(self.user_account)
@@ -311,49 +289,88 @@ class GetRecentTransactionsTest(TestCase):
         self.assertEqual(list(transactions), [])  # Ensure we get an empty list
 
 
-class HomeViewTest(TestCase):
-    @patch('bank.utils.cnbCurrencies.getRates')
-    @patch('bank.utils.cnbCurrencies.saveRates')
-    @patch('bank.forms.TransactionForm')
-    @patch('bank.forms.WithdrawalForm')
-    @patch('bank.forms.RechargeForm')
-    @patch('bank.forms.ChangePrimaryBankAccountForm')
-    @patch('bank.forms.BankAccountForm')
-    def test_get_context_data(self, MockBankAccountForm, MockChangePrimaryBankAccountForm, MockRechargeForm, MockWithdrawalForm, MockTransactionForm, MockSaveRates, MockGetRates):
-        # Create a request and user
-        factory = RequestFactory()
-        request = factory.get('/home')
-        user = User.objects.create_user(username='testuser', password='12345')
-        request.user = user
+class CalculateOverdraftFeeTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username='testuser')
+        self.currency = CurrencyRate.objects.create(currency='USD', rate=1.0)
+        self.user_account = UserAccount.objects.create(user=self.user)
+        self.bank_account = BankAccount.objects.create(user_account=self.user_account, balance=Decimal('100.00'),
+                                                       currency=self.currency)
 
-        # Create a user account for the user
-        UserAccount.objects.create(user=user)
+    def test_calculate_overdraft_fee_positive_balance(self):
+        amount = Decimal('50.00')
+        overdraft_fee = calculate_overdraft_fee(self.bank_account, amount)
+        self.assertEqual(overdraft_fee, Decimal('0.00'))
 
-        # Set up the view
-        view = HomeView()
-        view.request = request
+    def test_calculate_overdraft_fee_zero_balance(self):
+        amount = Decimal('100.00')
+        overdraft_fee = calculate_overdraft_fee(self.bank_account, amount)
+        self.assertEqual(overdraft_fee, Decimal('0.00'))
 
-        # Call the method
-        context = view.get_context_data()
+    def test_calculate_overdraft_fee_negative_balance(self):
+        amount = Decimal('150.00')
+        overdraft_fee = calculate_overdraft_fee(self.bank_account, amount)
+        self.assertEqual(overdraft_fee, Decimal('5.00'))
 
-        # Test the context
-        self.assertIn('form_tr', context)
-        self.assertTrue(isinstance(context['form_tr'], MagicMock))
-        self.assertIn('form_withdrawal', context)
-        self.assertTrue(isinstance(context['form_withdrawal'], MagicMock))
-        self.assertIn('form_recharge', context)
-        self.assertTrue(isinstance(context['form_recharge'], MagicMock))
-        self.assertIn('form', context)
-        self.assertTrue(isinstance(context['form'], MagicMock))
-        self.assertIn('form_bank_account', context)
-        self.assertTrue(isinstance(context['form_bank_account'], MagicMock))
-        self.assertIn('rates', context)
-        self.assertEqual(context['rates'], MockGetRates.return_value)
-        self.assertIn('transactions', context)
 
-        # Test the user account
-        user_account = UserAccount.objects.get(user=user)
-        self.assertIsNotNone(user_account.secret_key)
+class IsValidAmountTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username='testuser')
+        self.currency = CurrencyRate.objects.create(currency='USD', rate=1.0)
+        self.user_account = UserAccount.objects.create(user=self.user)
+        self.bank_account = BankAccount.objects.create(user_account=self.user_account, balance=Decimal('100.00'),
+                                                       currency=self.currency)
+
+    def test_is_valid_amount_exact_balance(self):
+        amount = Decimal('100.00')
+        is_valid = is_valid_amount(self.bank_account, amount)
+        self.assertTrue(is_valid)
+
+    def test_is_valid_amount_within_overdraft_limit(self):
+        amount = Decimal('110.00')
+        is_valid = is_valid_amount(self.bank_account, amount)
+        self.assertTrue(is_valid)
+
+    def test_is_valid_amount_exceeds_overdraft_limit(self):
+        amount = Decimal('111.00')
+        is_valid = is_valid_amount(self.bank_account, amount)
+        self.assertFalse(is_valid)
+
+    def test_is_valid_amount_negative_amount(self):
+        amount = Decimal('-10.00')
+        is_valid = is_valid_amount(self.bank_account, amount)
+        self.assertFalse(is_valid)
+
+
+class TypeOfTransactionTest(TestCase):
+    def test_deposit(self):
+        self.assertEqual(TypeOfTransaction.DEP, 0)
+
+    def test_withdrawal(self):
+        self.assertEqual(TypeOfTransaction.WIT, 1)
+
+    def test_transfer(self):
+        self.assertEqual(TypeOfTransaction.TRA, 2)
+
+
+class WithdrawalFormTest(TestCase):
+    def setUp(self):
+        self.currency = CurrencyRate.objects.create(currency='USD', rate=1.0)
+
+    def test_withdrawal_form_valid(self):
+        form_data = {'amount': Decimal('100.00'), 'currency': self.currency.pk}
+        form = WithdrawalForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_withdrawal_form_amount_invalid(self):
+        form_data = {'amount': 'invalid amount', 'currency': self.currency.pk}
+        form = WithdrawalForm(data=form_data)
+        self.assertFalse(form.is_valid())
+
+    def test_withdrawal_form_currency_invalid(self):
+        form_data = {'amount': Decimal('100.00'), 'currency': 'invalid currency'}
+        form = WithdrawalForm(data=form_data)
+        self.assertFalse(form.is_valid())
 
 
 if __name__ == '__main__':

@@ -10,10 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
+import sys
 from pathlib import Path
 
 from celery.schedules import crontab
-import psycopg2
 from .celery import app as celery_app
 from django.contrib import messages
 from django.urls import reverse_lazy
@@ -102,23 +102,30 @@ WSGI_APPLICATION = 'Banking.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'd62eakcfa2fqcj',
-        'USER': 'xcyqconkmdpuss',
-        'PASSWORD': 'b5eb554862de0486465f2c3035f3622482dc413a6f300d2eff2d9478b914bba9',
-        'HOST': 'ec2-99-80-190-165.eu-west-1.compute.amazonaws.com',
-        'PORT': '5432',
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'd62eakcfa2fqcj',
+            'USER': 'xcyqconkmdpuss',
+            'PASSWORD': 'b5eb554862de0486465f2c3035f3622482dc413a6f300d2eff2d9478b914bba9',
+            'HOST': 'ec2-99-80-190-165.eu-west-1.compute.amazonaws.com',
+            'PORT': '5432',
+        }
+    }
 
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -155,7 +162,7 @@ USE_TZ = True
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'Banking/static'),)
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 CELERY_BEAT_SCHEDULE = {

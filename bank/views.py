@@ -111,7 +111,7 @@ class ChangePrimaryBankAccountView(LoginRequiredMixin, View):
 
 
 def is_valid_amount(account, amount):
-    return amount <= account.balance + account.balance * Decimal('0.1')
+    return Decimal('0') <= amount <= account.balance + account.balance * Decimal('0.1')
 
 
 def calculate_overdraft_fee(account, amount):
