@@ -1,3 +1,4 @@
+import sys
 import unittest
 from decimal import Decimal
 
@@ -9,6 +10,8 @@ from django.urls import reverse
 from django.test import TestCase, Client
 from django.test import TestCase
 from django.contrib.auth.models import User
+
+from Banking import settings, urls
 from bank.forms import ChangePrimaryBankAccountForm, WithdrawalForm, RechargeForm, NewUserForm
 from bank.twoFactorMiddleWare import TwoFactorAuthMiddleware
 from bank.views import is_valid_amount, calculate_overdraft_fee
@@ -308,6 +311,13 @@ class BankLoginViewTest(TestCase):
         user = auth.get_user(self.client)
         self.assertTrue(user.is_authenticated)
         self.assertEqual(response.status_code, 302)  # Successful login should redirect
+
+class DatabaseSettingsTest(TestCase):
+    def test_database_configuration(self):
+        from django.conf import settings
+        self.assertEqual(settings.DATABASES['default']['ENGINE'], 'django.db.backends.sqlite3' if 'test' in sys.argv else 'django.db.backends.postgresql_psycopg2')
+
+
 
 
 if __name__ == '__main__':
